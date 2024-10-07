@@ -38,18 +38,21 @@ def main():
     """
     # Parse arguments
     args = parse_arguments()
+    root_path = os.getcwd()
 
     # Ensure correct paths
     input_path = args.input_path
     input_path = input_path.replace('/', os.sep).replace('\\', os.sep)
+    input_path = os.path.join(root_path, input_path)
     output_path = args.output_path
     output_path = output_path.replace('/', os.sep).replace('\\', os.sep)
+    output_path = os.path.join(root_path, output_path)
 
-    print(f'Input path: {input_path}')
-    print(f'Output path: {output_path}')
+    print(f'Input path set to {input_path}')
+    print(f'Output path set to {output_path}')
 
     # Initializes directory
-    directory = DirectoryInitializer(os.path.curdir)
+    directory = DirectoryInitializer(root_path)
 
 
 if __name__ == '__main__':
