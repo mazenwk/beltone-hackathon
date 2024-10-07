@@ -5,6 +5,7 @@ from datetime import datetime
 
 from Scripts.Initialization.directory_initializer import DirectoryInitializer
 from Scripts.Data.csv_date_merger import CSVDateMerger
+from Scripts.Logging.logging_config import configure_logging
 
 
 def main():
@@ -63,35 +64,8 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def setup_logging(log_dir='logs', log_file_prefix='run'):
-    """
-    Sets up logging to output logs to both the console and a log file.
-
-    Args:
-        log_dir (str): Directory where log files will be saved. Defaults to 'logs'.
-        log_file_prefix (str): Prefix for the log file name. Defaults to 'run'.
-    """
-    # Create the log directory if it doesn't exist
-    os.makedirs(log_dir, exist_ok=True)
-
-    # Create a unique log file name with a timestamp
-    log_file = os.path.join(log_dir, f"{log_file_prefix}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log")
-
-    # Set up the root logger
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-        handlers=[
-            logging.StreamHandler(),  # Log to console
-            logging.FileHandler(log_file, mode='w')  # Log to file, 'w' for overwrite mode
-        ]
-    )
-
-    logging.info(f"Logging started. Logs will be saved to {log_file}")
-
-
 if __name__ == '__main__':
     # Set up logging to output messages to the console & save log files
-    setup_logging()
+    configure_logging()
+    logger = logging.getLogger(__name__)
     main()
