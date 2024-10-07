@@ -33,9 +33,13 @@ def parse_arguments():
 
 
 def main():
+    """
+    Entry point for the application. Parses command-line arguments and invokes processing functions.
+    """
+    # Parse arguments
     args = parse_arguments()
-    directory = DirectoryInitializer(os.path.curdir)
 
+    # Ensure correct paths
     input_path = args.input_path
     input_path = input_path.replace('/', os.sep).replace('\\', os.sep)
     output_path = args.output_path
@@ -43,6 +47,9 @@ def main():
 
     print(f'Input path: {input_path}')
     print(f'Output path: {output_path}')
+
+    # Initializes directory
+    directory = DirectoryInitializer(os.path.curdir)
 
 
 if __name__ == '__main__':
