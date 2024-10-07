@@ -24,7 +24,7 @@ class DirectoryInitializer:
         if path is None:
             path = os.getcwd()
         if dirs is None:
-            dirs = ['Output', 'Pickles']
+            dirs = ['Output', 'Pickles', 'Data']
 
         self.path = os.path.normpath(os.path.abspath(path))
         self.dirs = dirs
