@@ -29,7 +29,7 @@ class CSVDateMerger:
             skip_files (list[str]): List of filenames to skip. Defaults to ['target_gold.csv'] if not provided.
         """
         if skip_files is None:
-            skip_files = ['target_gold.csv']
+            skip_files = ['target_gold.csv', 'news.csv']
 
         self.folder_path = folder_path
         self.date_column = date_column.lower()
@@ -53,7 +53,7 @@ class CSVDateMerger:
 
             # Skip the specified files
             if filename in self.skip_files:
-                logging.info(f'Skipping file {filename} as specified.')
+                logging.warning(f'Skipping file {filename} as specified.')
                 continue
 
             try:
@@ -64,12 +64,15 @@ class CSVDateMerger:
 
                 # Parse the date column, ensuring it's in the right format
                 if self.date_column in df.columns:
-                    df[self.date_column] = pd.to_datetime(df[self.date_column])
+                    df[self.date_column] = pd.to_datetime(
+                        df[self.date_column], format='mixed', utc=True
+                    ).dt.date
                     logging.info(f'Read {filename} with {len(df)} rows.')
                     dataframes.append(df)
                 else:
                     logging.warning(
-                        f'The date column "{self.date_column}" was not found in {filename}. Skipping this file.')
+                        f'The date column "{self.date_column}" was not found in {filename}. Skipping this file.'
+                    )
             except Exception as e:
                 logging.error(f'Error reading {filename}: {e}')
         return dataframes

@@ -32,7 +32,7 @@ def configure_logging():
     console_handler.setLevel(logging.DEBUG)
 
     # formatter = ColorFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    formatter = ColorFormatter('(%(asctime)s) [%(levelname)s]: %(message)s')
+    formatter = ColorFormatter('(%(asctime)s) [%(levelname)s]:   \t%(message)s')
     console_handler.setFormatter(formatter)
 
     # Add the console handler to the logger
