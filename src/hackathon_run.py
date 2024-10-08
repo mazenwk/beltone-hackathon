@@ -2,9 +2,12 @@ import os
 import argparse
 import logging
 
+import pandas as pd
+
 from Scripts.Initialization.directory_initializer import DirectoryInitializer
 from Scripts.Data.csv_date_merger import CSVDateMerger
 from Scripts.Logging.logging_config import configure_logging
+from Scripts.Preprocess.preprocess import Preprocessor
 
 
 def main():
@@ -32,7 +35,11 @@ def main():
     data_df = csv_merger.merge()
     csv_merger.save_merged_csv(os.path.join(root_path, 'Data'))
 
-    print(data_df.head())
+    preprocessor = Preprocessor()
+    intraday_gold_df = pd.read_csv(os.path.join(input_path, 'intraday_gold.csv'))
+    intraday_gold_df = preprocessor.preprocess_intraday_gold_prices(intraday_gold_df)
+    print(intraday_gold_df.head())
+
 
 
 def parse_arguments():
