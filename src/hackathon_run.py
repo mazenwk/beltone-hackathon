@@ -37,8 +37,8 @@ def main():
 
     preprocessor = Preprocessor()
     intraday_gold_df = pd.read_csv(os.path.join(input_path, 'intraday_gold.csv'))
-    intraday_gold_df = preprocessor.preprocess_intraday_gold_prices(intraday_gold_df)
-    print(intraday_gold_df.head())
+    closing_prices_df = preprocessor.preprocess_intraday_gold_prices(intraday_gold_df)
+    print(closing_prices_df.head())
 
 
 
