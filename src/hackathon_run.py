@@ -1,7 +1,6 @@
 import os
 import argparse
 import logging
-from datetime import datetime
 
 from Scripts.Initialization.directory_initializer import DirectoryInitializer
 from Scripts.Data.csv_date_merger import CSVDateMerger
