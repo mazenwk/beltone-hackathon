@@ -17,6 +17,7 @@ def main():
     # Parse arguments
     args = parse_arguments()
     root_path = os.getcwd()
+    data_path = os.path.join(root_path, 'Data')
 
     # Ensure correct paths by normalizing paths and converting to absolute paths
     input_path = os.path.normpath(os.path.abspath(args.input_path))
@@ -38,8 +39,8 @@ def main():
     preprocessor = Preprocessor()
     intraday_gold_df = pd.read_csv(os.path.join(input_path, 'intraday_gold.csv'))
     closing_prices_df = preprocessor.preprocess_intraday_gold_prices(intraday_gold_df)
+    closing_prices_df.to_csv(os.path.join(data_path, 'closing_prices.csv'))
     print(closing_prices_df.head())
-
 
 
 def parse_arguments():
