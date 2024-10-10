@@ -1,11 +1,9 @@
 import os
 import argparse
 import logging
-
-import pandas as pd
+import scipy
 
 from Scripts.Initialization.directory_initializer import DirectoryInitializer
-from Scripts.Data.csv_date_merger import CSVDateMerger
 from Scripts.Logging.logging_config import configure_logging
 from Scripts.Preprocess.preprocess import Preprocessor
 
@@ -30,17 +28,9 @@ def main():
     directory = DirectoryInitializer(root_path)
     directory.initialize()
 
-    csv_merger = CSVDateMerger(input_path)
-
-    # Run the process to merge the DataFrames
-    data_df = csv_merger.merge()
-    csv_merger.save_merged_csv(os.path.join(root_path, 'Data'))
-
-    preprocessor = Preprocessor()
-    intraday_gold_df = pd.read_csv(os.path.join(input_path, 'intraday_gold.csv'))
-    closing_prices_df = preprocessor.preprocess_intraday_gold_prices(intraday_gold_df)
-    closing_prices_df.to_csv(os.path.join(data_path, 'closing_prices.csv'))
-    print(closing_prices_df.head())
+    preprocessor = Preprocessor(input_path)
+    merged = preprocessor.get_merged_dataframe()
+    merged.to_csv(os.path.join(data_path, 'merged.csv'), index=True)
 
 
 def parse_arguments():
