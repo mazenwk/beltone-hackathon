@@ -7,8 +7,8 @@ import torch
 from Scripts.Initialization.directory_initializer import DirectoryInitializer
 from Scripts.Logging.logging_config import configure_logging
 from Scripts.Preprocess.preprocess import Preprocessor
-from Scripts.tft_model_predictor import TFTModelPredictor
-from Scripts.module.TFT_module import CustomMultiHorizonMetric  #! DO NOT REMOVE THIS IMPORT
+from Scripts.module.tft_model_predictor import TFTModelPredictor
+from Scripts.module.custom_metrics import CustomMultiHorizonMetric
 
 
 def main():

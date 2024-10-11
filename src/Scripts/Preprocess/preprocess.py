@@ -38,7 +38,7 @@ class Preprocessor:
         self.loader = DictCSVLoader(self.input_path)
         logging.info(f"Preprocessor initialized with input path: {self.input_path}")
 
-    def get_top_features_corr_with_Closing_Gold_prices(self, merged, num_feat_to_include = 20):
+    def get_top_corr_featuers(self, merged, num_feat_to_include=20):
         """
         Gets the top features correlated with Closing Gold prices.
 
@@ -60,13 +60,14 @@ class Preprocessor:
         df = df.select_dtypes(include=['int64', 'float64'])
         # Step 2: Correlation Heatmap
         correlation_matrix = df.corr()
-        top_feat = correlation_matrix.nlargest(num_feat_to_include,'closing_price').index
-        features =[]
+        top_feat = correlation_matrix.nlargest(num_feat_to_include, 'closing_price').index
+        features = []
         for feat in top_feat:
             features.append(feat)
-        
+
         return features
-    def get_TimeSeries_dataloader(self, merged, features, num_workers: int = 0):
+
+    def get_timeseries_dataloader(self, merged, features, num_workers: int = 0):
         """
         Gets a TimeSeries DataLoader from a merged DataFrame containing all the features.
 
@@ -84,11 +85,11 @@ class Preprocessor:
         DataLoader:
             A DataLoader for the TimeSeriesDataSet.
         """
-        lenght_merged = len(merged)
-        merged['time_idx'] = range(lenght_merged)  # Create a sequential time index
+        length_merged = len(merged)
+        merged['time_idx'] = range(length_merged)  # Create a sequential time index
         merged['group_id'] = 0  # Use a constant group ID for all data points
-        target = 'dummy_target' 
-        merged[target] = 0 
+        target = 'dummy_target'
+        merged[target] = 0
 
         time_series_dataset = TimeSeriesDataSet(
             data=merged,
@@ -101,7 +102,7 @@ class Preprocessor:
             min_encoder_length=60,
             max_encoder_length=100,
             min_prediction_length=1,  # Minimum prediction length (set to 1 for next time step)
-            max_prediction_length=lenght_merged,
+            max_prediction_length=length_merged,
             static_categoricals=[],  # Include any static categorical features if available
             static_reals=[],  # Include any static real-valued features if available
             time_varying_known_categoricals=[],  # Add known categorical features if any
@@ -109,10 +110,9 @@ class Preprocessor:
             time_varying_unknown_categoricals=[],  # Add any unknown categorical features if available
             time_varying_unknown_reals=[]  # Add unknown real-valued features if available
         )
-        dl = DataLoader(time_series_dataset, batch_size=1, shuffle=False, collate_fn=time_series_dataset._collate_fn, num_workers=num_workers )
+        dl = DataLoader(time_series_dataset, batch_size=1, shuffle=False, collate_fn=time_series_dataset._collate_fn,
+                        num_workers=num_workers)
         return dl
-            
-
 
     def get_merged_dataframe(self) -> pd.DataFrame:
         """

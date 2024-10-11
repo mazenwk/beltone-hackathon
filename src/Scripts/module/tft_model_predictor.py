@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 from pytorch_lightning import Trainer
 
-from Scripts.module.TFT_module import TemporalFusionTransformerModule, CustomMultiHorizonMetric
+from Scripts.module.tft_module import TemporalFusionTransformerModule
+from Scripts.module.custom_metrics import CustomMultiHorizonMetric
 from Scripts.Preprocess.preprocess import Preprocessor
 
 
@@ -123,10 +124,10 @@ class TFTModelPredictor:
         try:
             logging.info("Starting data preprocessing.")
             preprocessor = Preprocessor(input_path=self.input_path)
-            features = preprocessor.get_top_features_corr_with_Closing_Gold_prices(
+            features = preprocessor.get_top_corr_featuers(
                 merged, num_feat_to_include=self.num_feat_to_include
             )
-            dataloader = preprocessor.get_TimeSeries_dataloader(
+            dataloader = preprocessor.get_timeseries_dataloader(
                 merged=merged, features=features, num_workers=self.num_workers
             )
             logging.info("Data preprocessing completed successfully.")
@@ -161,6 +162,7 @@ class TFTModelPredictor:
 
             # Preprocess the data
             _, dataloader = self.preprocess_data(merged)
+            print(dataloader)
 
             # Predict using the trained model
             predictions = trainer.predict(model, dataloaders=dataloader)
