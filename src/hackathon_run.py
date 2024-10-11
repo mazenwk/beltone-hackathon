@@ -3,12 +3,16 @@ import argparse
 import logging
 import pandas as pd
 import torch
+import sys
 
 from Scripts.Initialization.directory_initializer import DirectoryInitializer
 from Scripts.Logging.logging_config import configure_logging
 from Scripts.Preprocess.preprocess import Preprocessor
 from Scripts.module.tft_model_predictor import TFTModelPredictor
 from Scripts.module.custom_metrics import CustomMultiHorizonMetric
+from Scripts.Downloading_lib.downloading_libraries import download_library
+
+
 
 
 def main():
@@ -31,6 +35,12 @@ def main():
 
     logging.info(f'Input path set to: {input_path}')
     logging.info(f'Output path set to: {output_path}')
+
+    
+    # Download pytorch_forecasting and pytorch_lightning
+    download_library('pytorch-forecasting')
+    sys.path.append(os.path.abspath('Libraries'))
+
 
     # Initializes directory using the current working directory
     directory = DirectoryInitializer(root_path)
