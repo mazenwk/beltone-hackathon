@@ -2,10 +2,13 @@ import os
 import argparse
 import logging
 import scipy
+import pandas as pd
 
 from Scripts.Initialization.directory_initializer import DirectoryInitializer
 from Scripts.Logging.logging_config import configure_logging
 from Scripts.Preprocess.preprocess import Preprocessor
+from Scripts.TFT import TFT_model
+from Scripts.module.TFT_module import CustomMultiHorizonMetric
 
 
 def main():
@@ -31,6 +34,14 @@ def main():
     preprocessor = Preprocessor(input_path)
     merged = preprocessor.get_merged_dataframe()
     merged.to_csv(os.path.join(data_path, 'merged.csv'), index=True)
+    merged = merged.set_index(merged['date'])
+    predictions = TFT_model(input_path, merged)
+    
+    # output df
+    output_df = pd.DataFrame({'Date': merged.index[:len(predictions[0])], 'Prediction': predictions[0]})
+
+    output_df.to_csv(output_path, index=False)
+    print(f"Predictions saved to {output_path}")
 
 
 def parse_arguments():
@@ -47,14 +58,14 @@ def parse_arguments():
     parser.add_argument(
         '--input_path',
         type=str,
-        default='InputData/',
+        default='src/InputData/',
         required=False,
         help='Path to the input file or directory. Defaults to "InputData/".')
 
     parser.add_argument(
         '--output_path',
         type=str,
-        default='predictions.csv',
+        default='src/Output/pred.csv',
         required=False,  # Change to True if this argument must be provided by the user
         help='Path to the output file. Defaults to "predictions.csv".')
 

@@ -2,10 +2,13 @@ import logging
 from typing import Tuple
 import pandas as pd
 
-from src.Scripts.Preprocess.data_preprocess.csv_loader import DictCSVLoader
-from src.Scripts.Preprocess.data_preprocess.data_preprocessor import DataPreprocessor
-from src.Scripts.Preprocess.data_preprocess.dataframe_merger import DataFrameMerger
-from src.Scripts.Preprocess.data_preprocess.intraday_gold_processor import IntradayGoldProcessor
+from Scripts.Preprocess.data_preprocess.csv_loader import DictCSVLoader
+from Scripts.Preprocess.data_preprocess.data_preprocessor import DataPreprocessor
+from Scripts.Preprocess.data_preprocess.dataframe_merger import DataFrameMerger
+from Scripts.Preprocess.data_preprocess.intraday_gold_processor import IntradayGoldProcessor
+
+from pytorch_forecasting.data.timeseries import TimeSeriesDataSet
+from torch.utils.data import DataLoader
 
 
 class Preprocessor:
@@ -34,6 +37,82 @@ class Preprocessor:
         self.input_path = input_path
         self.loader = DictCSVLoader(self.input_path)
         logging.info(f"Preprocessor initialized with input path: {self.input_path}")
+
+    def get_top_features_corr_with_Closing_Gold_prices(self, merged, num_feat_to_include = 20):
+        """
+        Gets the top features correlated with Closing Gold prices.
+
+        Parameters:
+        -----------
+        merged : pd.DataFrame
+            A merged DataFrame containing all the features and the 'Closing_Gold_Price' column.
+        num_feat_to_include : int, optional
+            The number of top features to include. Defaults to 20.
+
+        Returns:
+        -------
+        list:
+            A list of the top features correlated with the 'Closing_Gold_Price' column.
+        """
+        # `df` is the dataset with your features and gold prices
+        df = merged.copy()  # Make a copy to work with
+        # drop non_numeric columns
+        df = df.select_dtypes(include=['int64', 'float64'])
+        # Step 2: Correlation Heatmap
+        correlation_matrix = df.corr()
+        top_feat = correlation_matrix.nlargest(num_feat_to_include,'closing_price').index
+        features =[]
+        for feat in top_feat:
+            features.append(feat)
+        
+        return features
+    def get_TimeSeries_dataloader(self, merged, features, num_workers: int = 0):
+        """
+        Gets a TimeSeries DataLoader from a merged DataFrame containing all the features.
+
+        Parameters:
+        -----------
+        merged : pd.DataFrame
+            A merged DataFrame containing all the features and the 'Closing_Gold_Price' column.
+        features : list
+            A list of the top features correlated with the 'Closing_Gold_Price' column.
+        num_workers : int, optional
+            The number of workers to use in the DataLoader. Defaults to 0.
+
+        Returns:
+        -------
+        DataLoader:
+            A DataLoader for the TimeSeriesDataSet.
+        """
+        lenght_merged = len(merged)
+        merged['time_idx'] = range(lenght_merged)  # Create a sequential time index
+        merged['group_id'] = 0  # Use a constant group ID for all data points
+        target = 'dummy_target' 
+        merged[target] = 0 
+
+        time_series_dataset = TimeSeriesDataSet(
+            data=merged,
+            time_idx='time_idx',
+            allow_missing_timesteps=False,
+            predict_mode=True,
+            target='dummy_target',
+            target_normalizer=None,
+            group_ids=["group_id"],  # List of group ids; use a constant if not grouping
+            min_encoder_length=60,
+            max_encoder_length=100,
+            min_prediction_length=1,  # Minimum prediction length (set to 1 for next time step)
+            max_prediction_length=lenght_merged,
+            static_categoricals=[],  # Include any static categorical features if available
+            static_reals=[],  # Include any static real-valued features if available
+            time_varying_known_categoricals=[],  # Add known categorical features if any
+            time_varying_known_reals=features,  # The features that vary over time
+            time_varying_unknown_categoricals=[],  # Add any unknown categorical features if available
+            time_varying_unknown_reals=[]  # Add unknown real-valued features if available
+        )
+        dl = DataLoader(time_series_dataset, batch_size=1, shuffle=False, collate_fn=time_series_dataset._collate_fn, num_workers=num_workers )
+        return dl
+            
+
 
     def get_merged_dataframe(self) -> pd.DataFrame:
         """
