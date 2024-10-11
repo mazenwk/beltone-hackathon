@@ -136,7 +136,7 @@ class Preprocessor:
 
             # Interpolate only numeric columns using a 3rd-degree polynomial
             numeric_columns = merged.select_dtypes(include=['number']).columns
-            merged[numeric_columns] = merged[numeric_columns].interpolate(method='polynomial', order=2)
+            merged[numeric_columns] = merged[numeric_columns].interpolate(method='polynomial', order=2, limit_direction='forward')
             logging.info("Applied polynomial interpolation to numeric columns.")
 
             # Drop any remaining rows with NaN values
