@@ -40,8 +40,6 @@ def main():
     merged = preprocessor.get_merged_dataframe()
     merged.to_csv(os.path.join(data_path, 'merged.csv'), index=True)
     merged = merged.set_index(merged['date'])
-    logging.info(chosen_pickle)
-    logging.info(chosen_checkpoint)
 
     # Initialize the model predictor with paths and other parameters
     model_predictor = TFTModelPredictor(

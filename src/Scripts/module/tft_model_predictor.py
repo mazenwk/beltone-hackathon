@@ -75,6 +75,7 @@ class TFTModelPredictor:
             logging.info(f"Loading pre-trained TFT model from {self.model_path}.")
             with open(self.model_path, 'rb') as file:
                 loaded_model = joblib.load(file)
+                loaded_model.to(self.device)
 
             model = TemporalFusionTransformerModule(loaded_model).to(self.device)
             logging.info("Model loaded successfully.")
@@ -159,6 +160,7 @@ class TFTModelPredictor:
             # Load the model and weights
             model = self.load_pretrained_model()
             self.load_model_weights(model)
+            model.to(self.device)
 
             # Preprocess the data
             _, dataloader = self.preprocess_data(merged)
