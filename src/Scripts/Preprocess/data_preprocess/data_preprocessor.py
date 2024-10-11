@@ -183,10 +183,10 @@ class DataPreprocessor:
             logging.info("Starting preprocessing steps.")
             self.convert_effr_to_numeric()
             self.handle_missing_values(threshold, forward_fill_stocks)
-            self.normalize_numerical_columns()
+            # self.normalize_numerical_columns()
             if handle_outliers:
                 self.handle_outliers()
-            self.engineer_features()
+            # self.engineer_features()
             self.sort_by_date()
             logging.info("Preprocessing completed successfully.")
             return self.df

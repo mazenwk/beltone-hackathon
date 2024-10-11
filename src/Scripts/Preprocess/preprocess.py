@@ -52,7 +52,7 @@ class Preprocessor:
             closing_df = self.get_processed_closing_prices_df()
 
             # Merge the DataFrames on the 'date' column
-            merged = data_df.merge(closing_df, on='date', how='left')
+            merged = closing_df.merge(data_df, on='date')
             logging.info("DataFrames merged successfully.")
 
             # Interpolate only numeric columns using a 3rd-degree polynomial
@@ -63,6 +63,10 @@ class Preprocessor:
             # Drop any remaining rows with NaN values
             merged.dropna(inplace=True)
             logging.info("Dropped NaN values from the merged DataFrame.")
+
+            merged['date'] = pd.to_datetime(merged['date']).dt.date
+            merged.sort_values(by='date', ascending=True, inplace=True)
+            merged.reset_index(drop=True, inplace=True)
 
             return merged
 
