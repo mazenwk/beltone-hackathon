@@ -1,14 +1,14 @@
 import os
 import argparse
 import logging
-import scipy
 import pandas as pd
+import torch
 
 from Scripts.Initialization.directory_initializer import DirectoryInitializer
 from Scripts.Logging.logging_config import configure_logging
 from Scripts.Preprocess.preprocess import Preprocessor
-from Scripts.TFT import TFT_model
-from Scripts.module.TFT_module import CustomMultiHorizonMetric
+from Scripts.tft_model_predictor import TFTModelPredictor
+from Scripts.module.TFT_module import CustomMultiHorizonMetric  #! DO NOT REMOVE THIS IMPORT
 
 
 def main():
@@ -18,11 +18,16 @@ def main():
     # Parse arguments
     args = parse_arguments()
     root_path = os.getcwd()
-    data_path = os.path.join(root_path, 'Data')
 
     # Ensure correct paths by normalizing paths and converting to absolute paths
     input_path = os.path.normpath(os.path.abspath(args.input_path))
     output_path = os.path.normpath(os.path.abspath(args.output_path))
+    data_path = os.path.normpath(os.path.abspath(os.path.join(root_path, 'Data')))
+    pickles_path = os.path.normpath(os.path.abspath(os.path.join(root_path, 'Pickles')))
+    checkpoints_path = os.path.normpath(os.path.abspath(os.path.join(root_path, 'Checkpoints')))
+
+    chosen_pickle = os.path.normpath(os.path.abspath(os.path.join(pickles_path, 'TFT_model.pkl')))
+    chosen_checkpoint = os.path.normpath(os.path.abspath(os.path.join(checkpoints_path, 'tft_module_.pth')))
 
     logging.info(f'Input path set to: {input_path}')
     logging.info(f'Output path set to: {output_path}')
@@ -35,8 +40,22 @@ def main():
     merged = preprocessor.get_merged_dataframe()
     merged.to_csv(os.path.join(data_path, 'merged.csv'), index=True)
     merged = merged.set_index(merged['date'])
-    predictions = TFT_model(input_path, merged)
-    
+    logging.info(chosen_pickle)
+    logging.info(chosen_checkpoint)
+
+    # Initialize the model predictor with paths and other parameters
+    model_predictor = TFTModelPredictor(
+        input_path=input_path,
+        model_path=chosen_pickle,
+        checkpoint_path=chosen_checkpoint,
+        num_feat_to_include=20,
+        num_workers=2,
+        device='cuda' if torch.cuda.is_available() else 'cpu'
+    )
+
+    # # Get the predictions
+    predictions = model_predictor.predict(merged)
+
     # output df
     output_df = pd.DataFrame({'Date': merged.index[:len(predictions[0])], 'Prediction': predictions[0]})
 
@@ -58,14 +77,14 @@ def parse_arguments():
     parser.add_argument(
         '--input_path',
         type=str,
-        default='src/InputData/',
+        default='./InputData',
         required=False,
         help='Path to the input file or directory. Defaults to "InputData/".')
 
     parser.add_argument(
         '--output_path',
         type=str,
-        default='src/Output/pred.csv',
+        default='predictions.csv',
         required=False,  # Change to True if this argument must be provided by the user
         help='Path to the output file. Defaults to "predictions.csv".')
 

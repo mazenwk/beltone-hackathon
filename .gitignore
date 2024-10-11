@@ -164,3 +164,4 @@ cython_debug/
 /.conda
 .idea/material_theme_project_new.xml
 /src/Workout/lightning_logs
+/src/lightning_logs
