@@ -8,6 +8,7 @@ from Scripts.Preprocess.data_preprocess.dataframe_merger import DataFrameMerger
 from Scripts.Preprocess.data_preprocess.intraday_gold_processor import IntradayGoldProcessor
 
 from pytorch_forecasting.data.timeseries import TimeSeriesDataSet
+from pytorch_forecasting.data import TorchNormalizer
 from torch.utils.data import DataLoader
 
 
@@ -90,14 +91,16 @@ class Preprocessor:
         merged['group_id'] = 0  # Use a constant group ID for all data points
         target = 'dummy_target'
         merged[target] = 0
-
+        Normalizer = TorchNormalizer(method='robust')
+        
         time_series_dataset = TimeSeriesDataSet(
             data=merged,
+            scalers=Normalizer,
             time_idx='time_idx',
             allow_missing_timesteps=False,
             predict_mode=True,
             target='dummy_target',
-            target_normalizer=None,
+            target_normalizer=Normalizer,
             group_ids=["group_id"],  # List of group ids; use a constant if not grouping
             min_encoder_length=60,
             max_encoder_length=100,
