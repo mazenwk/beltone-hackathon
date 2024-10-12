@@ -1,9 +1,6 @@
-import sys
-from Scripts.Install_requirements.install_requirements import download_library
-
-# Download pytorch_forecasting and pytorch_lightning
-download_library('pytorch_forecasting')
-sys.path.append(os.path.abspath('Libraries'))
+# Installing pytorch_forecasting and pytorch_lightning (dependencies)
+from Scripts.Install_requirements.install_requirements import install_requirements
+install_requirements('requirements.txt')
 
 import os
 import argparse
