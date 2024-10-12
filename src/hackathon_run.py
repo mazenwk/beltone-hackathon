@@ -1,12 +1,15 @@
+import sys
+from Scripts.Install_requirements.install_requirements import download_library
+
+# Download pytorch_forecasting and pytorch_lightning
+download_library('pytorch_forecasting')
+sys.path.append(os.path.abspath('Libraries'))
+
 import os
 import argparse
 import logging
 import pandas as pd
 import torch
-import sys
-# Installing pytorch_forecasting and pytorch_lightning (dependencies)
-from Scripts.Install_requirements.install_requirements import install_requirements
-install_requirements('requirements.txt')
 
 from Scripts.Initialization.directory_initializer import DirectoryInitializer
 from Scripts.Logging.logging_config import configure_logging
@@ -61,7 +64,7 @@ def main():
         device='cuda' if torch.cuda.is_available() else 'cpu'
     )
 
-    # # Get the predictions
+    # Get the predictions
     predictions = model_predictor.predict(merged)
 
     # output df
