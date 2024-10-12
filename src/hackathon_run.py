@@ -4,13 +4,15 @@ import logging
 import pandas as pd
 import torch
 import sys
+# Installing pytorch_forecasting and pytorch_lightning (dependencies)
+from Scripts.Install_requirements.install_requirements import install_requirements
+install_requirements('requirements.txt')
 
 from Scripts.Initialization.directory_initializer import DirectoryInitializer
 from Scripts.Logging.logging_config import configure_logging
 from Scripts.Preprocess.preprocess import Preprocessor
 from Scripts.module.tft_model_predictor import TFTModelPredictor
 from Scripts.module.custom_metrics import CustomMultiHorizonMetric
-from Scripts.Downloading_lib.downloading_libraries import download_library
 
 
 
@@ -37,10 +39,8 @@ def main():
     logging.info(f'Output path set to: {output_path}')
 
     
-    # Download pytorch_forecasting and pytorch_lightning
-    download_library('pytorch-forecasting')
-    sys.path.append(os.path.abspath('Libraries'))
-
+    
+    
 
     # Initializes directory using the current working directory
     directory = DirectoryInitializer(root_path)
